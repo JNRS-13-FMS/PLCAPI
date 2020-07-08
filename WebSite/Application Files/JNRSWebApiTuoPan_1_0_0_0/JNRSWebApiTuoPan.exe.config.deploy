@@ -16,30 +16,12 @@
     <!--<add key="baseAddress" value="http://127.0.0.1:9088/" />-->
     <!--远程端口-->
     <add key="baseAddress" value="http://192.168.1.173:9088/" />
-    <!--机器人料库点位183个（本次10个）-->
-    <add key="storeAddr" value="192.168.6.110,102,DB300.0,10,78" />
-    <!--出库20个（本次2个）-->
-    <add key="storeAddr2" value="192.168.6.110,102,DB401.0,2,78" />
-    <!--控制命令-->
-    <!--B0机器人控制命令标志位1 - DB200.66
-        B1总控控制命令标志位1 - DB200.67
-        B2=1机床上料请求、=2卸料请求,=3末件排空，4，其他 - DB200.68
-        B3机床编号（T1.-T6）- DB200.69
-        B4 - DB200.70
-        B5总控出库请求，1 - DB200.71
-        B6PLC出库请求应答，1- DB200.72
-        --> 
-    <add key="plcMonAddr" value="DB200.66,DB200.67,DB200.68,DB200.69,DB200.70,DB200.71,DB200.72,DB200.73,DB200.74" />
-    <!--响应机床上料请求-->
-    <add key="addrSetFeedingToMachine" value="DB200.0,DB200.9999,DB200.40" />
-    <!--响应机床换料请求-->
-    <add key="addrSetChangeToMachine" value="DB200.0,DB200.4,DB200.9999,DB200.40" />    
-    <!--响应机床卸料请求-->
-    <add key="addrSetUnloadToChannel" value="DB200.0" />
-    <!--响应出库请求-->
-    <add key="addrSetOutStock" value="DB200.0" />
-    <!--发出出库请求-->
-    <add key="addrRequestOutStock" value="DB200.71" />
+    <!--立库180点位-->
+    <add key="storeAddr" value="192.168.1.173,104,DB1.0,220,28" />
+    <!--PLC信号监控点位-->
+    <add key="plcMonAddr" value="DB1.6200" />
+    <!--向PLC写入地址-->
+    <add key="writeAddr" value="DB1.6400.0,DB1.6401,DB1.6402,DB1.6410,DB1.6420;DB1.6430.0,DB1.6431;DB1.6440.0,DB1.6441;DB1.6450.0,DB1.6451" />
   </appSettings>
 
   <system.web>

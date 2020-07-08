@@ -22,7 +22,7 @@ namespace JNRSWebApiOwinHost
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message+e.StackTrace);
+                Console.WriteLine(e.Message + e.StackTrace);
             }
 
             Console.WriteLine(string.Format("Server started,monitored at {0}", baseAddress));
