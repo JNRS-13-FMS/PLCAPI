@@ -24,48 +24,16 @@ namespace JNRSWebApiOwinHost
     {
         protected readonly ILog log = LogManager.GetLogger("JNRSLogger");
         string[] storeAddr = ConfigurationManager.AppSettings["storeAddr"].Split(',');//机器人料库点位183个（本次10个）
-       // string[] storeAddr2 = ConfigurationManager.AppSettings["storeAddr2"].Split(',');//出库20个（本次2个）
+        // string[] storeAddr2 = ConfigurationManager.AppSettings["storeAddr2"].Split(',');//出库20个（本次2个）
+        string[] storeAddr3 = ConfigurationManager.AppSettings["storeAddr3"].Split(',');//缓存料道入库1个（本次1个）
         string[] plcMonAddr = ConfigurationManager.AppSettings["plcMonAddr"].Split(',');
         string[] addrSetFeedingToMachine = ConfigurationManager.AppSettings["addrSetFeedingToMachine"].Split(',');
         string[] addrSetChangeToMachine = ConfigurationManager.AppSettings["addrSetChangeToMachine"].Split(',');
         string[] addrSetUnloadToChannel = ConfigurationManager.AppSettings["addrSetUnloadToChannel"].Split(',');
         string[] addrSetOutStock = ConfigurationManager.AppSettings["addrSetOutStock"].Split(',');
         string[] addrRequestOutStock = ConfigurationManager.AppSettings["addrRequestOutStock"].Split(',');
+        string[] addrRequestInStock = ConfigurationManager.AppSettings["addrRequestInStock"].Split(',');
         SiemensS7Net profinet = null;
-
-        [Route("Test")]
-        [HttpGet]
-        //测试
-        public IHttpActionResult TestAPI(string a, string b)
-        {
-            //http://127.0.0.1:9086/api/Siemens/Test?a=1&b=2
-            Console.WriteLine(a + "-" + b);
-            return Ok();
-        }
-        [Route("Test2")]
-        [HttpGet]
-        public object GetOther()
-        {
-            var lstRes = new List<ParaConfig>();
-
-            //实际项目中，通过后台取到集合赋值给lstRes变量。这里只是测试。
-            //lstRes.Add(new ParaConfig() { ip = "aaaa", run_state1 = "111", run_state2 = "111", run_state3 = "1111" });
-            //lstRes.Add(new ParaConfig() { ip = "bbbb", run_state1 = "222", run_state2 = "222", run_state3 = "2222" });
-
-            return lstRes;
-        }
-        [Route("Test3")]
-        [HttpGet]
-        public IHttpActionResult GetOrder()
-        {
-            var lstRes = new List<ParaConfig>();
-
-            //实际项目中，通过后台取到集合赋值给lstRes变量。这里只是测试。
-            //lstRes.Add(new ParaConfig() { ip = "aaaa", run_state1 = "111", run_state2 = "111", run_state3 = "1111" });
-            //lstRes.Add(new ParaConfig() { ip = "bbbb", run_state1 = "222", run_state2 = "222", run_state3 = "2222" });
-
-            return Json(lstRes);
-        }
 
         /// <summary>
         /// 立库所有库位扫描
@@ -324,7 +292,7 @@ namespace JNRSWebApiOwinHost
         /// <returns></returns>
         [Route("SetFeedingToMachine")]
         [HttpGet]
-        public IHttpActionResult SetFeedingToMachine(string location_no,string program_number, string workpiece_type)
+        public IHttpActionResult SetFeedingToMachine(string location_no, string program_number, string workpiece_type)
         {
             //http://127.0.0.1:9088/api/Siemens/SetFeedingToMachine
             DateTime begintime = DateTime.Now;
@@ -687,7 +655,7 @@ namespace JNRSWebApiOwinHost
                     {
                         rValue = writeByte(plcMonAddr[8], 1);
                     }
-                        
+
                     //else
                     //    rValue = true;
 
@@ -711,6 +679,285 @@ namespace JNRSWebApiOwinHost
             {
                 log.Error(ex.Message);
                 return BadRequest("总控控制命令标志位置零：" + ex.Message);
+            }
+        }
+        /// <summary>
+        /// 读取RFID内容-缓存料道上料口
+        /// </summary>
+        /// <returns></returns>
+        [Route("GetRFID")]
+        [HttpGet]
+        public IHttpActionResult GetRFID()
+        {
+            //http://127.0.0.1:9088/api/Siemens/GetRFID
+            DateTime begintime = DateTime.Now;
+            Console.WriteLine("Siemens/GetRFID开始调用-> " + begintime.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+            log.Info("Siemens/GetRFID开始调用-> " + begintime.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+
+            List<StoreModel> lstStore = new List<StoreModel>();
+            StoreModel _Store = null;
+            try
+            {
+                //连接
+                profinet = new SiemensS7Net(SiemensPLCS.S1200);
+                profinet.IpAddress = storeAddr[0];
+                profinet.Port = int.Parse(storeAddr[1]);
+                profinet.Rack = byte.Parse("0");
+                profinet.Slot = byte.Parse("0");
+
+                OperateResult connect = profinet.ConnectServer();
+                if (connect.IsSuccess)
+                {
+                    log.Info("PLC连接成功！" + profinet.IpAddress);
+                    Console.WriteLine("PLC连接成功！" + profinet.IpAddress);
+
+                    #region 缓存料道入库1个（本次1个）
+                    ushort _data_num = ushort.Parse(storeAddr3[3].ToString());//采集数据单元数量
+                    ushort _data_len = ushort.Parse(storeAddr3[4].ToString());//采集数据单元字节长度
+                    int _data_len_jd = _data_num * _data_len;
+                    //一次性获取所有数据
+                    byte[] alarmsgByte = _ReadManyBytes(storeAddr[2], ushort.Parse(_data_len_jd.ToString()));
+                    //拆分数据
+                    for (int i = 0; i < alarmsgByte.Length / _data_len; i++)
+                    {
+                        _Store = new StoreModel();
+
+                        _Store.location_no = ReadInt32Data(alarmsgByte, 0 + i * _data_len).ToString();
+                        _Store.workpiece_type = ReadInt32Data(alarmsgByte, 40 + i * _data_len).ToString();
+                        _Store.workpiece_status = ReadByteData(alarmsgByte, 60 + i * _data_len).ToString();
+                        _Store.mac_proc_info = ReadByteData(alarmsgByte, 66 + i * _data_len).ToString();
+                        //_Store.axis_x = ReadFloatData(alarmsgByte, 2 + i * _data_len);
+                        //_Store.axis_y = ReadFloatData(alarmsgByte, 6 + i * _data_len);
+
+                        lstStore.Add(_Store);
+                    }
+                    #endregion
+
+                    //断开
+                    profinet.ConnectClose();
+                }
+                else
+                {
+                    log.Error("PLC连接失败！" + profinet.IpAddress);
+                }
+
+                DateTime endtime = DateTime.Now;
+                string tick = ExecDateDiff(begintime, endtime);
+                Console.WriteLine("耗时" + tick + "毫秒\n");
+                log.Info("耗时" + tick + "毫秒\n");
+                //
+                return Json(lstStore);
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex.Message);
+                return BadRequest("获取状态失败：" + ex.Message);
+            }
+        }
+        /// <summary>
+        /// 监听入库请求信号()
+        /// </summary>
+        /// <returns></returns>
+        [Route("GetMonitorInStock")]
+        [HttpGet]
+        public IHttpActionResult GetMonitorInStock()
+        {
+            //http://127.0.0.1:9088/api/Siemens/GetMonitorInStock
+            DateTime begintime = DateTime.Now;
+            Console.WriteLine("Siemens/GetMonitorInStock开始调用-> " + begintime.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+            log.Info("Siemens/GetMonitorInStock开始调用-> " + begintime.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+            int plcMonData = 0;
+            try
+            {
+                //连接
+                profinet = new SiemensS7Net(SiemensPLCS.S1200);
+                profinet.IpAddress = storeAddr[0];
+                profinet.Port = int.Parse(storeAddr[1]);
+                profinet.Rack = byte.Parse("0");
+                profinet.Slot = byte.Parse("0");
+
+                OperateResult connect = profinet.ConnectServer();
+                if (connect.IsSuccess)
+                {
+                    log.Info("PLC连接成功！" + profinet.IpAddress);
+                    Console.WriteLine("PLC连接成功！" + profinet.IpAddress);
+                    //采集
+                    plcMonData = ReadByteDataNew(addrRequestInStock[0]);//PLC入库请求应答
+                    //断开
+                    profinet.ConnectClose();
+                }
+                else
+                {
+                    log.Error("PLC连接失败！" + profinet.IpAddress);
+                }
+
+                DateTime endtime = DateTime.Now;
+                string tick = ExecDateDiff(begintime, endtime);
+                Console.WriteLine("耗时" + tick + "毫秒\n");
+                log.Info("耗时" + tick + "毫秒\n");
+                //
+                return Json(plcMonData);
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex.Message);
+                return BadRequest("获取PLC请求信号失败：" + ex.Message);
+            }
+        }
+        /// <summary>
+        /// 监听单工件入库完成信号
+        /// </summary>
+        /// <returns></returns>
+        [Route("GetMonitorInStockComplete")]
+        [HttpGet]
+        public IHttpActionResult GetMonitorInStockComplete()
+        {
+            //http://127.0.0.1:9088/api/Siemens/GetMonitorInStockComplete
+            DateTime begintime = DateTime.Now;
+            Console.WriteLine("Siemens/GetMonitorInStockComplete开始调用-> " + begintime.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+            log.Info("Siemens/GetMonitorInStockComplete开始调用-> " + begintime.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+            int plcMonData = 0;
+            try
+            {
+                //连接
+                profinet = new SiemensS7Net(SiemensPLCS.S1200);
+                profinet.IpAddress = storeAddr[0];
+                profinet.Port = int.Parse(storeAddr[1]);
+                profinet.Rack = byte.Parse("0");
+                profinet.Slot = byte.Parse("0");
+
+                OperateResult connect = profinet.ConnectServer();
+                if (connect.IsSuccess)
+                {
+                    log.Info("PLC连接成功！" + profinet.IpAddress);
+                    Console.WriteLine("PLC连接成功！" + profinet.IpAddress);
+                    //采集
+                    plcMonData = ReadByteDataNew(addrRequestInStock[2]);//PLC入库完成信号
+                    //断开
+                    profinet.ConnectClose();
+                }
+                else
+                {
+                    log.Error("PLC连接失败！" + profinet.IpAddress);
+                }
+
+                DateTime endtime = DateTime.Now;
+                string tick = ExecDateDiff(begintime, endtime);
+                Console.WriteLine("耗时" + tick + "毫秒\n");
+                log.Info("耗时" + tick + "毫秒\n");
+                //
+                return Json(plcMonData);
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex.Message);
+                return BadRequest("获取PLC请求信号失败：" + ex.Message);
+            }
+        }
+        /// <summary>
+        /// 启动机器人执行入库动作
+        /// </summary>
+        /// <returns></returns>
+        [Route("SetRFIDReadComplete")]
+        [HttpGet]
+        public IHttpActionResult SetRFIDReadComplete()
+        {
+            //http://127.0.0.1:9088/api/Siemens/SetRFIDReadComplete
+            DateTime begintime = DateTime.Now;
+            Console.WriteLine("Siemens/SetRFIDReadComplete开始调用-> " + begintime.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+            log.Info("Siemens/SetRFIDReadComplete开始调用-> " + begintime.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+            bool rValue = false;
+            try
+            {
+                //连接
+                profinet = new SiemensS7Net(SiemensPLCS.S1200);
+                profinet.IpAddress = storeAddr[0];
+                profinet.Port = int.Parse(storeAddr[1]);
+                profinet.Rack = byte.Parse("0");
+                profinet.Slot = byte.Parse("0");
+
+                OperateResult connect = profinet.ConnectServer();
+                if (connect.IsSuccess)
+                {
+                    log.Info("PLC连接成功！" + profinet.IpAddress);
+                    Console.WriteLine("PLC连接成功！" + profinet.IpAddress);
+                    //采集
+                    rValue = writeByte(addrRequestInStock[1], 1);
+
+                    //断开
+                    profinet.ConnectClose();
+                }
+                else
+                {
+                    log.Error("PLC连接失败！" + profinet.IpAddress);
+                }
+
+                DateTime endtime = DateTime.Now;
+                string tick = ExecDateDiff(begintime, endtime);
+                Console.WriteLine("耗时" + tick + "毫秒\n");
+                log.Info("耗时" + tick + "毫秒\n");
+                //
+                return Json(rValue);
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex.Message);
+                return BadRequest("写入PLC出库数据失败：" + ex.Message);
+            }
+        }
+        /// <summary>
+        /// 复位启动机器人执行入库动作信号
+        /// </summary>
+        /// <returns></returns>
+        [Route("ResetRFIDReadComplete")]
+        [HttpGet]
+        public IHttpActionResult ResetRFIDReadComplete()
+        {
+            //http://127.0.0.1:9088/api/Siemens/ResetRFIDReadComplete
+            DateTime begintime = DateTime.Now;
+            Console.WriteLine("Siemens/ResetRFIDReadComplete开始调用-> " + begintime.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+            log.Info("Siemens/ResetRFIDReadComplete开始调用-> " + begintime.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+            bool rValue = false;
+            try
+            {
+                //连接
+                profinet = new SiemensS7Net(SiemensPLCS.S1200);
+                profinet.IpAddress = storeAddr[0];
+                profinet.Port = int.Parse(storeAddr[1]);
+                profinet.Rack = byte.Parse("0");
+                profinet.Slot = byte.Parse("0");
+
+                OperateResult connect = profinet.ConnectServer();
+                if (connect.IsSuccess)
+                {
+                    log.Info("PLC连接成功！" + profinet.IpAddress);
+                    Console.WriteLine("PLC连接成功！" + profinet.IpAddress);
+                    //采集
+                    int plcControl = ReadByteDataNew(addrRequestInStock[2]);
+                    if (plcControl == 1)
+                        rValue = writeByte(addrRequestInStock[1], 0);
+                    else
+                        rValue = true;
+
+                    //断开
+                    profinet.ConnectClose();
+                }
+                else
+                {
+                    log.Error("PLC连接失败！" + profinet.IpAddress);
+                }
+
+                DateTime endtime = DateTime.Now;
+                string tick = ExecDateDiff(begintime, endtime);
+                Console.WriteLine("耗时" + tick + "毫秒\n");
+                log.Info("耗时" + tick + "毫秒\n");
+                //
+                return Json(rValue);
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex.Message);
+                return BadRequest("复位启动机器人执行入库动作信号失败：" + ex.Message);
             }
         }
 
