@@ -53,7 +53,7 @@ namespace JNRSWebApiOwinHost
             try
             {
                 //连接
-                profinet = new SiemensS7Net(SiemensPLCS.S1200);
+                profinet = new SiemensS7Net(SiemensPLCS.S1500);
                 profinet.IpAddress = storeAddr[0];
                 profinet.Port = int.Parse(storeAddr[1]);
                 profinet.Rack = byte.Parse("0");
@@ -148,7 +148,7 @@ namespace JNRSWebApiOwinHost
             try
             {
                 //连接
-                profinet = new SiemensS7Net(SiemensPLCS.S1200);
+                profinet = new SiemensS7Net(SiemensPLCS.S1500);
                 profinet.IpAddress = storeAddr[0];
                 profinet.Port = int.Parse(storeAddr[1]);
                 profinet.Rack = byte.Parse("0");
@@ -200,7 +200,7 @@ namespace JNRSWebApiOwinHost
             try
             {
                 //连接
-                profinet = new SiemensS7Net(SiemensPLCS.S1200);
+                profinet = new SiemensS7Net(SiemensPLCS.S1500);
                 profinet.IpAddress = storeAddr[0];
                 profinet.Port = int.Parse(storeAddr[1]);
                 profinet.Rack = byte.Parse("0");
@@ -250,7 +250,7 @@ namespace JNRSWebApiOwinHost
             try
             {
                 //连接
-                profinet = new SiemensS7Net(SiemensPLCS.S1200);
+                profinet = new SiemensS7Net(SiemensPLCS.S1500);
                 profinet.IpAddress = storeAddr[0];
                 profinet.Port = int.Parse(storeAddr[1]);
                 profinet.Rack = byte.Parse("0");
@@ -302,7 +302,7 @@ namespace JNRSWebApiOwinHost
             try
             {
                 //连接
-                profinet = new SiemensS7Net(SiemensPLCS.S1200);
+                profinet = new SiemensS7Net(SiemensPLCS.S1500);
                 profinet.IpAddress = storeAddr[0];
                 profinet.Port = int.Parse(storeAddr[1]);
                 profinet.Rack = byte.Parse("0");
@@ -359,7 +359,7 @@ namespace JNRSWebApiOwinHost
             try
             {
                 //连接
-                profinet = new SiemensS7Net(SiemensPLCS.S1200);
+                profinet = new SiemensS7Net(SiemensPLCS.S1500);
                 profinet.IpAddress = storeAddr[0];
                 profinet.Port = int.Parse(storeAddr[1]);
                 profinet.Rack = byte.Parse("0");
@@ -417,7 +417,7 @@ namespace JNRSWebApiOwinHost
             try
             {
                 //连接
-                profinet = new SiemensS7Net(SiemensPLCS.S1200);
+                profinet = new SiemensS7Net(SiemensPLCS.S1500);
                 profinet.IpAddress = storeAddr[0];
                 profinet.Port = int.Parse(storeAddr[1]);
                 profinet.Rack = byte.Parse("0");
@@ -471,7 +471,7 @@ namespace JNRSWebApiOwinHost
             try
             {
                 //连接
-                profinet = new SiemensS7Net(SiemensPLCS.S1200);
+                profinet = new SiemensS7Net(SiemensPLCS.S1500);
                 profinet.IpAddress = storeAddr[0];
                 profinet.Port = int.Parse(storeAddr[1]);
                 profinet.Rack = byte.Parse("0");
@@ -523,7 +523,7 @@ namespace JNRSWebApiOwinHost
             try
             {
                 //连接
-                profinet = new SiemensS7Net(SiemensPLCS.S1200);
+                profinet = new SiemensS7Net(SiemensPLCS.S1500);
                 profinet.IpAddress = storeAddr[0];
                 profinet.Port = int.Parse(storeAddr[1]);
                 profinet.Rack = byte.Parse("0");
@@ -580,7 +580,7 @@ namespace JNRSWebApiOwinHost
             try
             {
                 //连接
-                profinet = new SiemensS7Net(SiemensPLCS.S1200);
+                profinet = new SiemensS7Net(SiemensPLCS.S1500);
                 profinet.IpAddress = storeAddr[0];
                 profinet.Port = int.Parse(storeAddr[1]);
                 profinet.Rack = byte.Parse("0");
@@ -637,7 +637,7 @@ namespace JNRSWebApiOwinHost
             try
             {
                 //连接
-                profinet = new SiemensS7Net(SiemensPLCS.S1200);
+                profinet = new SiemensS7Net(SiemensPLCS.S1500);
                 profinet.IpAddress = storeAddr[0];
                 profinet.Port = int.Parse(storeAddr[1]);
                 profinet.Rack = byte.Parse("0");
@@ -699,7 +699,7 @@ namespace JNRSWebApiOwinHost
             try
             {
                 //连接
-                profinet = new SiemensS7Net(SiemensPLCS.S1200);
+                profinet = new SiemensS7Net(SiemensPLCS.S1500);
                 profinet.IpAddress = storeAddr[0];
                 profinet.Port = int.Parse(storeAddr[1]);
                 profinet.Rack = byte.Parse("0");
@@ -770,7 +770,7 @@ namespace JNRSWebApiOwinHost
             try
             {
                 //连接
-                profinet = new SiemensS7Net(SiemensPLCS.S1200);
+                profinet = new SiemensS7Net(SiemensPLCS.S1500);
                 profinet.IpAddress = storeAddr[0];
                 profinet.Port = int.Parse(storeAddr[1]);
                 profinet.Rack = byte.Parse("0");
@@ -820,7 +820,7 @@ namespace JNRSWebApiOwinHost
             try
             {
                 //连接
-                profinet = new SiemensS7Net(SiemensPLCS.S1200);
+                profinet = new SiemensS7Net(SiemensPLCS.S1500);
                 profinet.IpAddress = storeAddr[0];
                 profinet.Port = int.Parse(storeAddr[1]);
                 profinet.Rack = byte.Parse("0");
@@ -870,7 +870,7 @@ namespace JNRSWebApiOwinHost
             try
             {
                 //连接
-                profinet = new SiemensS7Net(SiemensPLCS.S1200);
+                profinet = new SiemensS7Net(SiemensPLCS.S1500);
                 profinet.IpAddress = storeAddr[0];
                 profinet.Port = int.Parse(storeAddr[1]);
                 profinet.Rack = byte.Parse("0");
@@ -921,7 +921,7 @@ namespace JNRSWebApiOwinHost
             try
             {
                 //连接
-                profinet = new SiemensS7Net(SiemensPLCS.S1200);
+                profinet = new SiemensS7Net(SiemensPLCS.S1500);
                 profinet.IpAddress = storeAddr[0];
                 profinet.Port = int.Parse(storeAddr[1]);
                 profinet.Rack = byte.Parse("0");
@@ -958,6 +958,172 @@ namespace JNRSWebApiOwinHost
             {
                 log.Error(ex.Message);
                 return BadRequest("复位启动机器人执行入库动作信号失败：" + ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// 读取请求信号
+        /// </summary>
+        /// <returns></returns>
+        [Route("ReadByte4Req")]
+        [HttpGet]
+        public IHttpActionResult ReadByte4Req(string addr)
+        {
+            //http://127.0.0.1:9088/api/Siemens/ReadByte4Req
+            DateTime begintime = DateTime.Now;
+            Console.WriteLine("Siemens/ReadByte4Req开始调用-> " + begintime.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+            log.Info("Siemens/ReadByte4Req开始调用-> " + begintime.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+            int plcMonData = 0;
+            try
+            {
+                //连接
+                profinet = new SiemensS7Net(SiemensPLCS.S1500);
+                profinet.IpAddress = storeAddr[0];
+                profinet.Port = int.Parse(storeAddr[1]);
+                profinet.Rack = byte.Parse("0");
+                profinet.Slot = byte.Parse("0");
+
+                OperateResult connect = profinet.ConnectServer();
+                if (connect.IsSuccess)
+                {
+                    log.Info("PLC连接成功！" + profinet.IpAddress);
+                    Console.WriteLine("PLC连接成功！" + profinet.IpAddress);
+                    //采集
+                    plcMonData = ReadByteDataNew(addr);//PLC入库请求应答
+                    //断开
+                    profinet.ConnectClose();
+                }
+                else
+                {
+                    log.Error("PLC连接失败！" + profinet.IpAddress);
+                }
+
+                DateTime endtime = DateTime.Now;
+                string tick = ExecDateDiff(begintime, endtime);
+                Console.WriteLine("耗时" + tick + "毫秒\n");
+                log.Info("耗时" + tick + "毫秒\n");
+                //
+                return Json(plcMonData);
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex.Message);
+                return BadRequest(addr + "->ReadByte4Req失败：" + ex.Message);
+            }
+        }
+        /// <summary>
+        /// 写入请求信号
+        /// </summary>
+        /// <returns></returns>
+        [Route("WriteByte4Req")]
+        [HttpGet]
+        public IHttpActionResult WriteByte4Req(string addr, string keyValue)
+        {
+            //http://127.0.0.1:9088/api/Siemens/WriteByte4Req
+            DateTime begintime = DateTime.Now;
+            Console.WriteLine("Siemens/WriteByte4Req开始调用-> " + begintime.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+            log.Info("Siemens/WriteByte4Req开始调用-> " + begintime.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+            bool rValue = false;
+            try
+            {
+                //连接
+                profinet = new SiemensS7Net(SiemensPLCS.S1500);
+                profinet.IpAddress = storeAddr[0];
+                profinet.Port = int.Parse(storeAddr[1]);
+                profinet.Rack = byte.Parse("0");
+                profinet.Slot = byte.Parse("0");
+
+                OperateResult connect = profinet.ConnectServer();
+                if (connect.IsSuccess)
+                {
+                    log.Info("PLC连接成功！" + profinet.IpAddress);
+                    Console.WriteLine("PLC连接成功！" + profinet.IpAddress);
+                    //采集
+                    rValue = writeByte(addr, Convert.ToByte(keyValue));
+
+                    //断开
+                    profinet.ConnectClose();
+                }
+                else
+                {
+                    log.Error("PLC连接失败！" + profinet.IpAddress);
+                }
+
+                DateTime endtime = DateTime.Now;
+                string tick = ExecDateDiff(begintime, endtime);
+                Console.WriteLine("耗时" + tick + "毫秒\n");
+                log.Info("耗时" + tick + "毫秒\n");
+                //
+                return Json(rValue);
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex.Message);
+                return BadRequest(addr + keyValue.ToString() + "->WriteByte4Req失败：" + ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// 判断“工件数据-夹具UII标签”与“工件数据-夹具UMD数据标签”库位一致性
+        /// </summary>
+        /// <returns></returns>
+        [Route("JudgeUTag")]
+        [HttpGet]
+        public IHttpActionResult JudgeUTag()
+        {
+            //http://127.0.0.1:9088/api/Siemens/JudgeUTag
+            DateTime begintime = DateTime.Now;
+            Console.WriteLine("Siemens/JudgeUTag开始调用-> " + begintime.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+            log.Info("Siemens/JudgeUTag开始调用-> " + begintime.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+            int plcMonData = 0;
+            try
+            {
+                //连接
+                profinet = new SiemensS7Net(SiemensPLCS.S1500);
+                profinet.IpAddress = storeAddr[0];
+                profinet.Port = int.Parse(storeAddr[1]);
+                profinet.Rack = byte.Parse("0");
+                profinet.Slot = byte.Parse("0");
+
+                OperateResult connect = profinet.ConnectServer();
+                if (connect.IsSuccess)
+                {
+                    log.Info("PLC连接成功！" + profinet.IpAddress);
+                    Console.WriteLine("PLC连接成功！" + profinet.IpAddress);
+
+                    #region 缓存料道入库1个（本次1个）
+                    int _data_len = 32;
+                    string addr_uii = "DB200.98";
+                    string addr_umd = "DB200.130";
+                    //一次性获取所有数据
+                    byte[] bytesUii = _ReadManyBytes(addr_uii, ushort.Parse(_data_len.ToString()));
+                    byte[] bytesUmd = _ReadManyBytes(addr_umd, ushort.Parse(_data_len.ToString()));
+                    //拆分数据
+                    if (bytesUii[0]== bytesUmd[0] && bytesUii[1] == bytesUmd[1]&& bytesUii[2] == bytesUmd[2]&& bytesUii[3] == bytesUmd[3])
+                    {
+                        plcMonData = 1;
+                    }
+                    #endregion
+
+                    //断开
+                    profinet.ConnectClose();
+                }
+                else
+                {
+                    log.Error("PLC连接失败！" + profinet.IpAddress);
+                }
+
+                DateTime endtime = DateTime.Now;
+                string tick = ExecDateDiff(begintime, endtime);
+                Console.WriteLine("耗时" + tick + "毫秒\n");
+                log.Info("耗时" + tick + "毫秒\n");
+                //
+                return Json(plcMonData);
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex.Message);
+                return BadRequest("获取状态失败：" + ex.Message);
             }
         }
 
