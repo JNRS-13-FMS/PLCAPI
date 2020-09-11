@@ -725,7 +725,7 @@ namespace JNRSWebApiOwinHost
                         _Store.location_no = ReadInt32Data(alarmsgByte, 0 + i * _data_len).ToString();
                         _Store.workpiece_type = ReadInt32Data(alarmsgByte, 40 + i * _data_len).ToString();
                         _Store.workpiece_status = ReadByteData(alarmsgByte, 60 + i * _data_len).ToString();
-                        _Store.mac_proc_info = ReadByteData(alarmsgByte, 66 + i * _data_len).ToString();
+                        //_Store.mac_proc_info = ReadByteData(alarmsgByte, 66 + i * _data_len).ToString();
                         //_Store.axis_x = ReadFloatData(alarmsgByte, 2 + i * _data_len);
                         //_Store.axis_y = ReadFloatData(alarmsgByte, 6 + i * _data_len);
 
