@@ -77,9 +77,9 @@ namespace JNRSWebApiOwinHost
                         _Store = new StoreModel();
 
                         _Store.location_no = ReadInt32Data(alarmsgByte, 0 + i * _data_len).ToString();
-                        _Store.workpiece_type = ReadInt32Data(alarmsgByte, 40 + i * _data_len).ToString();
-                        _Store.workpiece_status = ReadByteData(alarmsgByte, 60 + i * _data_len).ToString();
-                        _Store.mac_proc_info = ReadByteData(alarmsgByte, 66 + i * _data_len).ToString();
+                        _Store.workpiece_type = ReadInt32Data(alarmsgByte, 4 + i * _data_len).ToString();
+                        _Store.workpiece_status = ReadByteData(alarmsgByte, 8 + i * _data_len).ToString();
+                        _Store.mac_proc_info = ReadByteData(alarmsgByte, 10 + i * _data_len).ToString();
                         //_Store.axis_x = ReadFloatData(alarmsgByte, 2 + i * _data_len);
                         //_Store.axis_y = ReadFloatData(alarmsgByte, 6 + i * _data_len);
 
@@ -716,21 +716,21 @@ namespace JNRSWebApiOwinHost
                     ushort _data_len = ushort.Parse(storeAddr3[4].ToString());//采集数据单元字节长度
                     int _data_len_jd = _data_num * _data_len;
                     //一次性获取所有数据
-                    byte[] alarmsgByte = _ReadManyBytes(storeAddr[2], ushort.Parse(_data_len_jd.ToString()));
+                    byte[] alarmsgByte = _ReadManyBytes(storeAddr3[2], ushort.Parse(_data_len_jd.ToString()));
                     //拆分数据
-                    for (int i = 0; i < alarmsgByte.Length / _data_len; i++)
-                    {
+                    //for (int i = 1; i < alarmsgByte.Length / _data_len; i++)
+                    //{
                         _Store = new StoreModel();
 
-                        _Store.location_no = ReadInt32Data(alarmsgByte, 0 + i * _data_len).ToString();
-                        _Store.workpiece_type = ReadInt32Data(alarmsgByte, 40 + i * _data_len).ToString();
-                        _Store.workpiece_status = ReadByteData(alarmsgByte, 60 + i * _data_len).ToString();
+                        _Store.location_no = ReadInt32Data(alarmsgByte, 0 ).ToString();
+                        _Store.workpiece_type = ReadInt32Data(alarmsgByte, 4 ).ToString();
+                        _Store.workpiece_status = ReadByteData(alarmsgByte, 9 ).ToString();
                         //_Store.mac_proc_info = ReadByteData(alarmsgByte, 66 + i * _data_len).ToString();
                         //_Store.axis_x = ReadFloatData(alarmsgByte, 2 + i * _data_len);
                         //_Store.axis_y = ReadFloatData(alarmsgByte, 6 + i * _data_len);
 
                         lstStore.Add(_Store);
-                    }
+                    //}
                     #endregion
 
                     //断开
@@ -1099,7 +1099,7 @@ namespace JNRSWebApiOwinHost
                     byte[] bytesUii = _ReadManyBytes(addr_uii, ushort.Parse(_data_len.ToString()));
                     byte[] bytesUmd = _ReadManyBytes(addr_umd, ushort.Parse(_data_len.ToString()));
                     //拆分数据
-                    if (bytesUii[0]== bytesUmd[0] && bytesUii[1] == bytesUmd[1]&& bytesUii[2] == bytesUmd[2]&& bytesUii[3] == bytesUmd[3])
+                    if (bytesUii[20]== bytesUmd[0] && bytesUii[21] == bytesUmd[1]&& bytesUii[22] == bytesUmd[2]&& bytesUii[23] == bytesUmd[3])
                     {
                         plcMonData = 1;
                     }
@@ -1135,12 +1135,16 @@ namespace JNRSWebApiOwinHost
         public int ReadByteData(byte[] bytes_dm, int len_D)
         {
             int data = 0;//需要返回的数据
+            string sdata = "";
             try
             {
                 if (bytes_dm.Length == 0)
                     return data;
-
-                data = bytes_dm[len_D];//取低位
+                for (int i = len_D; i < len_D+1; i++)
+                {
+                    sdata += Convert.ToChar(bytes_dm[i]);
+                }
+                data = Convert.ToInt32(sdata);//取低位
                 log.Info("ReadByteData读取结果：" + data);
                 return data;
             }
@@ -1196,17 +1200,13 @@ namespace JNRSWebApiOwinHost
                 if (bytes_dm.Length == 0)
                     return data;
 
-                tmpBuffer[0] = bytes_dm[len_D + 0];
-                tmpBuffer[1] = bytes_dm[len_D + 1];
-                tmpBuffer[2] = bytes_dm[len_D + 2];
-                tmpBuffer[3] = bytes_dm[len_D + 3];
+                for (int i = len_D; i < len_D+4; i++)
+                {
+                    sdata += Convert.ToChar(bytes_dm[i]);
+                }
+                
 
-                sdata += Convert.ToString(tmpBuffer[0], 2).PadLeft(8, '0');
-                sdata += Convert.ToString(tmpBuffer[1], 2).PadLeft(8, '0');
-                sdata += Convert.ToString(tmpBuffer[2], 2).PadLeft(8, '0');
-                sdata += Convert.ToString(tmpBuffer[3], 2).PadLeft(8, '0');
-
-                data = Convert.ToInt32(sdata, 2); //二进制字符串转十进制数
+                data = Convert.ToInt32(sdata); //字符串转十进制数
                 log.Info("ReadInt32Data读取结果：" + data);
                 return data;
             }
@@ -1216,6 +1216,8 @@ namespace JNRSWebApiOwinHost
                 return 0;
             }
         }
+
+        
         /// <summary>
         /// float读取(4 byte)
         /// </summary>
