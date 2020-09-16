@@ -63,7 +63,7 @@ namespace JNRSWebApiOwinHost
         void ShowAndRecordError(string errorMsg)
         {
             Console.WriteLine(errorMsg);
-            ShowAndRecordError(errorMsg);
+            log.Error(errorMsg);
         }
         /// <summary>
         /// 立库所有库位扫描(XXX)
@@ -885,6 +885,83 @@ namespace JNRSWebApiOwinHost
             catch (Exception ex)
             {
                 ShowAndRecordError(ex.Message);
+                return BadRequest("获取状态失败：" + ex.Message);
+            }
+        }
+
+
+        [Route("JudgeFeed")]
+        [HttpGet]
+        public IHttpActionResult JudgeFeed()
+        {
+            //http://127.0.0.1:9088/api/Siemens/JudgeFeed
+            DateTime begintime = DateTime.Now;
+            Console.WriteLine("判断工件库位类型状态一致性 -> " + begintime.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+            log.Info("判断工件库位类型状态一致性 -> " + begintime.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+            int plcMonData = 0;
+            List<StoreModel> lstStore = new List<StoreModel>();
+            StoreModel _m = null;
+            try
+            {
+                //profinet = new SiemensS7Net(SiemensPLCS.S1500);
+                //profinet.IpAddress = storeAddr[0];
+                //profinet.Port = Convert.ToInt32(storeAddr[1]);
+                //profinet.Slot = 0;
+                //profinet.Rack = 0;
+
+                //OperateResult connect = profinet.ConnectServer();
+                //if (connect.IsSuccess)
+
+                if (ServerIsConnected)
+                {
+                    #region 机床上料
+                    int _data_len = 140;
+                    string addr_uii = "DB200.0";
+                    //一次性获取所有数据
+                    byte[] bytesUii = _ReadManyBytes(addr_uii, ushort.Parse(_data_len.ToString()));
+
+                    _m = new StoreModel();
+                    _m.location_no = Convert.ToInt32(ReadStringData(bytesUii, 0, 4)).ToString();
+                    _m.workpiece_type = Convert.ToInt32(ReadStringData(bytesUii, 40, 4)).ToString();
+                    _m.workpiece_status = Convert.ToInt32(ReadStringData(bytesUii, 60, 1)).ToString();
+                    //拆分数据
+                    if (   bytesUii[0]  == bytesUii[130] 
+                        && bytesUii[1]  == bytesUii[131] 
+                        && bytesUii[2]  == bytesUii[132] 
+                        && bytesUii[3]  == bytesUii[133]
+                        && bytesUii[40] == bytesUii[134]
+                        && bytesUii[41] == bytesUii[135]
+                        && bytesUii[42] == bytesUii[136]
+                        && bytesUii[43] == bytesUii[137]
+                        && bytesUii[60] == bytesUii[139])
+                    {
+                        plcMonData = 1;
+                        Console.WriteLine("工件数据库位类型状态一致");
+                        log.Info("工件数据库位类型状态一致");
+                    }
+                    else
+                    {
+                        Console.WriteLine("库位类型状态不一致！！！");
+                        log.Error("库位类型状态不一致！！！");
+                    }
+                    _m.result = plcMonData.ToString();
+                    lstStore.Add(_m);
+                    #endregion
+                }
+                else
+                {
+                    Console.WriteLine("PLC连接失败！" + profinet.IpAddress);
+                    log.Error("PLC连接失败！" + profinet.IpAddress);
+                    _m.result = plcMonData.ToString();
+                    lstStore.Add(_m);
+                }
+                //
+                return Json(lstStore);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                log.Error(ex.Message);
                 return BadRequest("获取状态失败：" + ex.Message);
             }
         }

@@ -12,8 +12,7 @@ namespace JNRSWebApiOwinHost
         public string workpiece_type { get; set; }//工件数据-零件号 
         public string workpiece_status { get; set; }//工件数据-零件状态
         public string mac_proc_info { get; set; }//工件数据-机床加工信息
-
-        //public float axis_x { get; set; }
-        //public float axis_y { get; set; }
+        public string result { get; set; }//对比结果
+        
     }
 }
