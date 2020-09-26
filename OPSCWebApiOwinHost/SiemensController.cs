@@ -13,6 +13,7 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.Sockets;
 using System.Text;
 using System.Web;
 using System.Web.Http;
@@ -1049,6 +1050,146 @@ namespace JNRSWebApiOwinHost
                 return 0;
             }
         }
+
+        #region 相关代码
+        public NetworkStream stream;
+        TcpClient tcpclient;
+        StreamWriter sw;
+        StreamReader sr;
+        public bool createPLConn(int plcPort, string plcIP)
+        {
+            log.Info("plcPort:" + plcPort + " plcIP:" + plcIP);
+            try
+            {
+                tcpclient = new TcpClient(plcIP, plcPort);  // 连接服务器
+
+                if (tcpclient.Connected)
+                {
+                    stream = tcpclient.GetStream();   // 获取网络数据流对象
+                    log.Info("设备连接成功！");
+                    return true;
+                }
+                else
+                {
+                    log.Error("设备连接失败！");
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex.Message);
+                log.Error("Driver Error\n\nCould not initalize adapter - TCP/IP    \nConnection aborted");
+                return false;
+            }
+        }
+        /// <summary>
+        /// 断开PLC连接
+        /// </summary>
+        public bool disPLConn(TcpClient tcpclient)
+        {
+            // 断开连接
+            tcpclient.Close();
+            log.Info("设备断开连接成功！");
+            return true;
+        }
+        /// <summary>
+        /// 发送指令并接收结果
+        /// </summary>
+        /// <param name="address"></param>
+        /// <returns></returns>
+        public string SendAndRevData(string address)
+        {
+            string data = "";//需要返回的数据
+            try
+            {
+                bool con = true;
+                sw = new StreamWriter(stream);
+                sr = new StreamReader(stream, Encoding.GetEncoding("gb2312"));
+                string readResult = "";
+                while (con)
+                {
+                    try
+                    {
+                        stream.ReadTimeout = 10;//Set ReadEcho Timeout
+                        //Send 
+                        sw.Write(address + "\n");
+                        sw.Flush();
+
+                        while (true)
+                        {
+                            char c = (char)sr.Read();
+                            //科德机床
+                            if (c == 10)//Char("10) … 换行
+                            {
+                                //log.Info("遇到换行符，本次读取结束");
+                                break;
+                            }
+                            else
+                            {
+                                readResult += c;
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        log.Error(e.Message);
+                    }
+
+                    data = readResult;
+                    //log.Info("SendAndRevData:" + data);
+                    con = false;
+                }
+                return data;
+            }
+            catch (Exception ex)
+            {
+                log.Error("SendAndRevData读取失败：" + ex.Message);
+                return "";
+            }
+        }
+        /// <summary>
+        /// 向机床写入程序号
+        /// </summary>
+        /// <param name="addr"></param>
+        /// <param name="keyValue"></param>
+        /// <returns></returns>
+        [Route("WriteProgramNo2CNC")]
+        [HttpGet]
+        public IHttpActionResult WriteProgramNo2CNC(string plcIP, string workpiece_type)
+        {
+            //http://127.0.0.1:9088/api/Siemens/WriteProgramNo2CNC
+            DateTime begintime = DateTime.Now;
+            ShowAndRecordInfo("向机床写入程序号 -> " + begintime.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+            bool rValue = false;
+            try
+            {
+                bool connect = createPLConn(62944, plcIP);
+                if (connect)
+                {
+                    string addr = "<set><req>yes</req><st>plc</st><var>G_Num</var><val>" + workpiece_type + "</val></set>";
+                    //写入程序号
+                    ShowAndRecordInfo("写入:" + addr);
+                    string callback = SendAndRevData(addr);
+                    ShowAndRecordInfo("写入结果：" + callback);
+                    //
+                    disPLConn(tcpclient);
+                }
+                else
+                {
+                    ShowAndRecordError("设备连接失败！" + profinet.IpAddress);
+                }
+                //
+                return Json(rValue);
+            }
+            catch (Exception ex)
+            {
+                ShowAndRecordError(ex.Message);
+                return BadRequest(plcIP +" & "+ workpiece_type + "->WriteProgramNo2CNC异常：" + ex.Message);
+            }
+        }
+
+        #endregion
+
         /// <summary>
         /// short读取(2 byte)
         /// </summary>
@@ -1458,12 +1599,5 @@ namespace JNRSWebApiOwinHost
         }
 
         #endregion
-    }
-
-    public class BufferStation
-    {
-        public string StationID { get; set; }
-
-        public string Flag { get; set; }
     }
 }
