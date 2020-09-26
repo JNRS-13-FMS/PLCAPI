@@ -1171,6 +1171,8 @@ namespace JNRSWebApiOwinHost
                     ShowAndRecordInfo("写入:" + addr);
                     string callback = SendAndRevData(addr);
                     ShowAndRecordInfo("写入结果：" + callback);
+                    if (callback == "<set><var>G_Num</var></set>")
+                        rValue = true;
                     //
                     disPLConn(tcpclient);
                 }
