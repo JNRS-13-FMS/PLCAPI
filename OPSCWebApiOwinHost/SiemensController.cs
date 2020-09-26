@@ -967,6 +967,62 @@ namespace JNRSWebApiOwinHost
         }
 
         /// <summary>
+        /// 读取下料缓存工位信号
+        /// </summary>
+        /// <returns></returns>
+        [Route("ReadBufferStation")]
+        [HttpGet]
+        public IHttpActionResult ReadBufferStation()
+        {
+            //http://127.0.0.1:9088/api/Siemens/ReadBufferStation
+            DateTime begintime = DateTime.Now;
+            ShowAndRecordInfo("读取下料缓存工位信号 -> " + begintime.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+            
+            string _PDataAddr = "DB200.230";//起始点
+            int _PDataLen = 3;//长度
+            List<string> listbs = new List<string>();
+            byte[] bArr = new byte[_PDataLen];
+            string sdata = "";
+            try
+            {
+                if (ServerIsConnected)
+                {
+                    //采集
+                    OperateResult<byte[]> result = profinet.Read(_PDataAddr, Convert.ToUInt16(_PDataLen));
+                    if (result.IsSuccess)
+                    {
+                        bArr = result.Content;
+                        int cLen = 8;
+                        for (int i = 0; i < _PDataLen; i++)
+                        {
+                            sdata = Convert.ToString(bArr[i], 2).PadLeft(8, '0');
+                            log.Info("bArr[" + i.ToString() + "]:" + sdata);
+                            if (i == 2)
+                                cLen = 4;
+                            else
+                                cLen = 8;
+                            for (int j = 0; j < cLen; j++)
+                            {
+                                listbs.Add(sdata.Substring(7 - j, 1));//字符串倒序排列了，所以用7减去位数
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    ShowAndRecordError("PLC连接失败！" + profinet.IpAddress);
+                }
+                //
+                return Json(listbs);
+            }
+            catch (Exception ex)
+            {
+                ShowAndRecordError(ex.Message);
+                return BadRequest(_PDataAddr + "->ReadByte4Req失败：" + ex.Message);
+            }           
+            
+        }
+        /// <summary>
         /// byte读取(1 byte)
         /// </summary>
         /// <param name="address"></param>
@@ -1300,12 +1356,11 @@ namespace JNRSWebApiOwinHost
         /// <summary>
         /// 向PLC写int数据
         /// </summary>
-        public bool writeInt(string address, int _value)
+        public bool writeInt(string address, int value)
         {
             try
             {
-                string value = _value.ToString().PadLeft(4, '0');
-                OperateResult result = profinet.Write(address, value, Encoding.UTF8);
+                OperateResult result = profinet.Write(address, value);
                 if (result.IsSuccess)
                 {
                     return true;
@@ -1403,5 +1458,12 @@ namespace JNRSWebApiOwinHost
         }
 
         #endregion
+    }
+
+    public class BufferStation
+    {
+        public string StationID { get; set; }
+
+        public string Flag { get; set; }
     }
 }
